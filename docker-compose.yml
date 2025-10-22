@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  cloudops-cli:
+    build:
+      context: .  # Usa el Dockerfile en el directorio actual
+    container_name: cloudops-cli
+    volumes:
+      - ./workspace:/workspace  # Montar el directorio local en el contenedor
+    stdin_open: true  # Mantener el contenedor abierto
+    tty: true  # Mantener la terminal interactiva
+    command: bash  # Arrancar un bash por defecto
