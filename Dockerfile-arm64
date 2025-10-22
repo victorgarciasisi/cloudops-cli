@@ -1,0 +1,43 @@
+# Usar la imagen base de Ubuntu 24.04
+FROM ubuntu:24.04
+
+# Actualizar e instalar dependencias básicas
+RUN apt update && apt install -y \
+    ca-certificates \
+    curl \
+    unzip \
+    groff \
+    wget \
+	vim \
+    gpg
+
+# Instalar AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm -rf awscliv2.zip
+
+# Instalar kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/arm64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# Instalar Terraform
+RUN wget -O - https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list && \
+    apt update && apt install -y terraform
+
+# Instalar Terragrunt
+RUN OS="linux" && \
+    ARCH="arm64" && \
+    VERSION="v0.91.2" && \
+    BINARY_NAME="terragrunt_${OS}_${ARCH}" && \
+    curl -sL "https://github.com/gruntwork-io/terragrunt/releases/download/$VERSION/$BINARY_NAME" -o "$BINARY_NAME" && \
+    chmod u+x "$BINARY_NAME" && \
+    mv "$BINARY_NAME" /usr/local/bin/terragrunt
+
+# Establecer el directorio de trabajo
+WORKDIR /workspace
+
+# Comando por defecto
+CMD ["bash"]
+
