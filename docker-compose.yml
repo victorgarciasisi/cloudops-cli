@@ -7,6 +7,8 @@ services:
     container_name: cloudops-cli
     volumes:
       - ./workspace:/workspace  # Montar el directorio local en el contenedor
+      - /var/run/docker.sock:/var/run/docker.sock   # Permite al contenedor usar el daemon del host
+      - ~/.docker:/root/.docker                     # Compartir credenciales con el host
     stdin_open: true  # Mantener el contenedor abierto
     tty: true  # Mantener la terminal interactiva
     command: bash  # Arrancar un bash por defecto
